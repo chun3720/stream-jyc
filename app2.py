@@ -25,6 +25,7 @@ def predict():
     # st.success(f"{df.columns}")
     
     x, y = df.columns[0], df.columns[1]
+    df[x] = df[x] - df[x].iloc[0]
     st.line_chart(df, x = x, y = y)
     st.success(f"{df.columns}")
 
