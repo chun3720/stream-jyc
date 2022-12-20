@@ -8,13 +8,14 @@ EXPOSE 8080
 #Copy Requirements.txt file into app directory
 COPY requirements.txt app/requirements.txt
 
+RUN echo export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL = True
 #install all requirements in requirements.txt
 RUN pip install -r app/requirements.txt
 
 #Copy all files in current directory into app directory
 COPY . /app
 
-COPY /src app/src
+COPY /src /app/src
 
 #Change Working Directory to app directory
 WORKDIR /app
