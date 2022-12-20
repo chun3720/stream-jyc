@@ -1,3 +1,6 @@
 pandas
 streamlit
+Supycap
+matplotlib
+numpy
 # plotly

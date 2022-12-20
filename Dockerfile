@@ -1,5 +1,6 @@
 #Base Image to use
-FROM python:3.7.9-slim
+FROM python:3.8.16-slim
+# FROM python:3.7.9-slim
 
 #Expose port 8080
 EXPOSE 8080
@@ -12,6 +13,8 @@ RUN pip install -r app/requirements.txt
 
 #Copy all files in current directory into app directory
 COPY . /app
+
+COPY /src app/src
 
 #Change Working Directory to app directory
 WORKDIR /app
