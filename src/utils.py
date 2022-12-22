@@ -7,6 +7,7 @@ from src.Battery_wonatech import LIB_cyc, LIB_tot, LIB_sep
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+import pickle
 
 
 def supycap(file, example=False):
@@ -78,8 +79,11 @@ def battery_cycle(files):
     cycle_obj = LIB_cyc(CYC)
 
     mass = cycle_obj.raw.mass.iloc[0]
-    df = profile_obj.get_separation(mass)
-    profile_obj.raw.to_parquet("raw_with_mass.pqt")
+    df, curve_object = profile_obj.get_separation(mass)
+    
+    
+    with open("battery_object.pkl", 'wb') as f:
+        pickle.dump(curve_object, f)
 
     # print1
     # fig, ax = plt.subplots()
@@ -121,7 +125,78 @@ def battery_cycle(files):
     # st.plotly_chart(fig3)
 
 
-def battery_curve():
-    df = pd.read_parquet("raw_with_mass.pqt")
+def battery_curve(choices):
+    
+    # print(choices)
+    dummy = list(map(int, choices))
+    # print(dummy)
+    dummy = np.array(dummy)
+    dummy -= 1
+    with open("battery_object.pkl", "rb") as f:
+        curve_object = pickle.load(f)
+    
+    # print(num_cycles)
+    # for single curve    
+    # single_curve = curve_object[0]
+    # single_obj = LIB_sep(single_curve)
+    # single_obj.get_GCD()
+    
+    
+    # fig3 = go.Figure()
+    
+    
 
-    st.write(df.columns)
+    # fig3.add_trace(go.Scatter(x = single_obj.df["q_c"]
+    #                        ,y = single_obj.df["v_c"]
+    #                        ,mode = 'lines'
+    #                        ,line = dict(color = 'firebrick', width = 4)
+    #                     #    ,color = 'firebrick'
+    #                        ))
+    # fig3.add_trace(go.Scatter(x = single_obj.df["q_d"]
+    #                        ,y = single_obj.df["v_d"]
+    #                        ,mode = 'lines'
+    #                        ,line = dict(color = 'firebrick', width = 4)
+    #                     #    ,color = 'firebrick'
+    #                        ))
+    # fig3.update_layout(showlegend = False
+    #                    ,xaxis_title = dict(text = "Capacity (Ah/g)")
+    #                    ,yaxis_title = dict(text = "Voltage (V)")
+    #                    )
+
+    # st.plotly_chart(fig3)
+    
+    # for multi curve
+    fig3 = go.Figure()
+    curve_object = np.array(curve_object, dtype = object)
+    multi_curves = curve_object[dummy]
+    
+    for curve in multi_curves:
+        curve_obj = LIB_sep(curve)
+        curve_obj.get_GCD()
+        
+        fig3.add_trace(go.Scatter(x = curve_obj.df["q_c"]
+                           ,y = curve_obj.df["v_c"]
+                           ,mode = 'lines'
+                           ,line = dict(color = 'firebrick', width = 4)
+                        #    ,color = 'firebrick'
+                           ))
+        fig3.add_trace(go.Scatter(x = curve_obj.df["q_d"]
+                           ,y = curve_obj.df["v_d"]
+                           ,mode = 'lines'
+                           ,line = dict(color = 'firebrick', width = 4)
+                        #    ,color = 'firebrick'
+                           ))
+        
+        
+    fig3.update_layout(showlegend = False
+                       ,xaxis_title = dict(text = "Capacity (Ah/g)")
+                       ,yaxis_title = dict(text = "Voltage (V)")
+                       )
+
+    st.plotly_chart(fig3)
+    
+    
+    
+    
+
+#     st.write(df.columns)

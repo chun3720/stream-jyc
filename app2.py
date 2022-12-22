@@ -1,4 +1,5 @@
 import streamlit as st
+import pickle
 
 # import numpy as np
 # import pandas as pd
@@ -48,10 +49,19 @@ elif choice == "Battery":
     )
 
     st.button(
-        "Battery analysis", on_click=src.utils.battery_cycle, kwargs={"files": files}
+        "Specific Capacity vs cycle", on_click=src.utils.battery_cycle, kwargs={"files": files}
     )
+    with open("battery_object.pkl", "rb") as f:
+        curve_object = pickle.load(f)
+    
+    cycle_list = list(map(str, range(1, len(curve_object) +1)))
 
-    st.button("Battery curve", on_click=src.utils.battery_curve)
+    cycle_choice = st.multiselect("Selet cycle number to display", cycle_list, key = 'choice')
+    st.write("You selected: ", cycle_choice)
+    
+    # print(cycle_choice)
+
+    st.button("Battery curve", on_click=src.utils.battery_curve, kwargs = {"choices": cycle_choice})
     # cycle_list = list(map(str, range(len(curve_object))))
 
     # cycle_choice = st.multiselect("Selet cycle number to display", cycle_list)
