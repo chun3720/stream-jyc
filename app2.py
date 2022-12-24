@@ -43,26 +43,44 @@ if choice == "Supercap":
         )
 
 elif choice == "Battery":
-    files = st.file_uploader(
-        label="select files (shoud include both DC and CYC file) :",
-        accept_multiple_files=True,
-    )
+    agree = st.checkbox("See example analysis")
+    if agree:
+        file1 = os.path.join(example_path, "Battery_DC.pkl")
+        file2 = os.path.join(example_path, "Battery_CYC.csv")
+        st.button(
+            "Battery analysis",
+            on_click=src.utils.battery_cycle,
+            kwargs={"files": [file1, file2], "example": True},
+        )
+    else:
+        files = st.file_uploader(
+            label="select files (shoud include both DC and CYC file) :",
+            accept_multiple_files=True,
+        )
 
-    st.button(
-        "Specific Capacity vs cycle", on_click=src.utils.battery_cycle, kwargs={"files": files}
-    )
-    with open("battery_object.pkl", "rb") as f:
-        curve_object = pickle.load(f)
-    
-    cycle_list = list(map(str, range(1, len(curve_object) +1)))
+        st.button(
+            "Specific Capacity vs cycle",
+            on_click=src.utils.battery_cycle,
+            kwargs={"files": files},
+        )
+        with open("battery_object.pkl", "rb") as f:
+            curve_object = pickle.load(f)
 
-    cycle_choice = st.multiselect("Selet cycle number to display", cycle_list, key = 'choice')
-    st.write("You selected: ", cycle_choice)
-    
-    # print(cycle_choice)
+        cycle_list = list(map(str, range(1, len(curve_object) + 1)))
 
-    st.button("Battery curve", on_click=src.utils.battery_curve, kwargs = {"choices": cycle_choice})
-    # cycle_list = list(map(str, range(len(curve_object))))
+        cycle_choice = st.multiselect(
+            "Selet cycle number to display", cycle_list, key="choice"
+        )
+        st.write("You selected: ", cycle_choice)
 
-    # cycle_choice = st.multiselect("Selet cycle number to display", cycle_list)
-    # st.write("You selected: ", cycle_choice)
+        # print(cycle_choice)
+
+        st.button(
+            "Battery curve",
+            on_click=src.utils.battery_curve,
+            kwargs={"choices": cycle_choice},
+        )
+        # cycle_list = list(map(str, range(len(curve_object))))
+
+        # cycle_choice = st.multiselect("Selet cycle number to display", cycle_list)
+        # st.write("You selected: ", cycle_choice)
