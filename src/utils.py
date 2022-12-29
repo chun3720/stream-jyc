@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from src.supycap import Supycap_obj, Supycap_example
 from src.Battery_wonatech import LIB_cyc, LIB_tot, LIB_sep
+from src.LSV import LSV_curve
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
@@ -240,3 +241,40 @@ def battery_curve(choices):
 
 
 #     st.write(df.columns)
+def catalysis(file):
+    lsv_obj = LSV_curve(file)
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x = lsv_obj.df["Ewe/V"]
+                             ,y = lsv_obj.df["I/mA"]
+                             ,mode = "lines"
+                             ))
+    
+    
+    st.plotly_chart(fig)
+    # st.line_chart(lsv_obj.df, x="Ewe/V", y="I/mA")
+    
+    
+    area = st.text_input("type electrode area (cm2)", "0.2376")
+    
+    shift = st.text_input("type voltage shift (V)", "0.9")
+    
+    
+    
+    
+    def convert_df(raw_df, area, shift):
+        df = raw_df[["Ewe/V", "I/mA"]].copy()
+        df["Ewe/V"] += shift
+        df["I/mA"] /= area
+        
+        return df.to_csv(index = False).encode('utf-8')
+    
+    csv = convert_df(lsv_obj.df, float(area), float(shift))
+    
+    st.download_button(
+        label = "Download data as CSV"
+        ,data = csv
+        ,file_name = "converted_df.csv"
+        ,mime = "text/csv"
+    )
+        

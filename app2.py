@@ -18,7 +18,7 @@ import os
 # dummy2 = "0928 18-61-1 LiP-ECDEC_02_CstC_cycle_4.csv"
 curr_path = pathlib.Path().resolve()
 example_path = os.path.join(curr_path, "example")
-choice = st.selectbox("Select to analyze", ("Supercap", "Battery"))
+choice = st.selectbox("Select to analyze", ("Supercap", "Battery", "Oxygen electrocatalysis"))
 st.write("You selected: ", choice)
 
 
@@ -84,3 +84,11 @@ elif choice == "Battery":
 
         # cycle_choice = st.multiselect("Selet cycle number to display", cycle_list)
         # st.write("You selected: ", cycle_choice)
+elif choice == "Oxygen electrocatalysis":
+    file = st.file_uploader(
+        label = "select file (.mpr file)"
+    )
+    
+    st.button(
+        "Simple plot", on_click = src.utils.catalysis, kwargs= {"file" : file}
+    )
