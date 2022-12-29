@@ -243,38 +243,35 @@ def battery_curve(choices):
 #     st.write(df.columns)
 def catalysis(file):
     lsv_obj = LSV_curve(file)
-    
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x = lsv_obj.df["Ewe/V"]
-                             ,y = lsv_obj.df["I/mA"]
-                             ,mode = "lines"
-                             ))
-    
-    
+    fig.add_trace(go.Scatter(x=lsv_obj.df["Ewe/V"], y=lsv_obj.df["I/mA"], mode="lines"))
+
+    fig.update_layout(
+        showlegend=False,
+        xaxis_title=dict(text="Potential (V vs. Ag/AgCl)"),
+        yaxis_title=dict(text="Current (mA)"),
+    )
+
     st.plotly_chart(fig)
     # st.line_chart(lsv_obj.df, x="Ewe/V", y="I/mA")
-    
-    
+
     area = st.text_input("type electrode area (cm2)", "0.2376")
-    
+
     shift = st.text_input("type voltage shift (V)", "0.9")
-    
-    
-    
-    
+
     def convert_df(raw_df, area, shift):
         df = raw_df[["Ewe/V", "I/mA"]].copy()
         df["Ewe/V"] += shift
         df["I/mA"] /= area
-        
-        return df.to_csv(index = False).encode('utf-8')
-    
+
+        return df.to_csv(index=False).encode("utf-8")
+
     csv = convert_df(lsv_obj.df, float(area), float(shift))
-    
+
     st.download_button(
-        label = "Download data as CSV"
-        ,data = csv
-        ,file_name = "converted_df.csv"
-        ,mime = "text/csv"
+        label="Download data as CSV",
+        data=csv,
+        file_name="converted_df.csv",
+        mime="text/csv",
     )
-        
