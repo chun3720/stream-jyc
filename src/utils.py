@@ -241,18 +241,47 @@ def battery_curve(choices):
 
 
 #     st.write(df.columns)
-def catalysis(file):
-    lsv_obj = LSV_curve(file)
+def catalysis(files):
+    
+    # for single file --------------------
+    # lsv_obj = LSV_curve(file)
 
+    # fig = go.Figure()
+    # fig.add_trace(go.Scatter(x=lsv_obj.df["Ewe/V"], y=lsv_obj.df["I/mA"], mode="lines"))
+
+    # fig.update_layout(
+    #     showlegend=False,
+    #     xaxis_title=dict(text="Potential (V vs. Ag/AgCl)"),
+    #     yaxis_title=dict(text="Current (mA)"),
+    # )
+    # -------------------------------------------------1
+    lsv_objs = [LSV_curve(file) for file in files]
+    
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=lsv_obj.df["Ewe/V"], y=lsv_obj.df["I/mA"], mode="lines"))
-
+    
+    
+    tot_df = pd.DataFrame()
+    tot_header = []
+    for i, lsv in enumerate(lsv_objs):
+        cols = ["Ewe/V", "I/mA"]
+        tot_df = pd.concat([tot_df, lsv.df[cols]], axis = 1, ignore_index =True)
+        header = [f"E_{i}", f"I/{lsv.name}"]
+        tot_header += header
+        fig.add_trace(
+            go.Scatter(
+                x = lsv.df["Ewe/V"]
+                ,y = lsv.df["I/mA"]
+                ,mode = "lines"
+                ,name = f"{lsv.name}"
+            )
+        )
+    tot_df.columns = tot_header
     fig.update_layout(
-        showlegend=False,
+        showlegend=True,
         xaxis_title=dict(text="Potential (V vs. Ag/AgCl)"),
         yaxis_title=dict(text="Current (mA)"),
     )
-
+    
     st.plotly_chart(fig)
     # st.line_chart(lsv_obj.df, x="Ewe/V", y="I/mA")
 
@@ -261,17 +290,21 @@ def catalysis(file):
     shift = st.text_input("type voltage shift (V)", "0.9")
 
     def convert_df(raw_df, area, shift):
-        df = raw_df[["Ewe/V", "I/mA"]].copy()
-        df["Ewe/V"] += shift
-        df["I/mA"] /= area
-
+        df = raw_df.copy()
+        
+        for i, col in enumerate(df.columns):
+            if i%2 == 0:
+                df[col] += shift
+            elif i%2 == 1:
+                df[col] /= area
+        
         return df.to_csv(index=False).encode("utf-8")
 
-    csv = convert_df(lsv_obj.df, float(area), float(shift))
+    csv = convert_df(tot_df, float(area), float(shift))
 
     st.download_button(
         label="Download data as CSV",
         data=csv,
-        file_name="converted_df.csv",
+        file_name="converted_total.csv",
         mime="text/csv",
     )

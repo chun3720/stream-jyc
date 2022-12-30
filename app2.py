@@ -85,10 +85,11 @@ elif choice == "Battery":
         # cycle_choice = st.multiselect("Selet cycle number to display", cycle_list)
         # st.write("You selected: ", cycle_choice)
 elif choice == "Oxygen electrocatalysis":
-    file = st.file_uploader(
+    files = st.file_uploader(
         label = "select file (.mpr file)"
+        ,accept_multiple_files=True
     )
     
     st.button(
-        "Simple plot", on_click = src.utils.catalysis, kwargs= {"file" : file}
+        "Simple plot", on_click = src.utils.catalysis, kwargs= {"files" : files}
     )
