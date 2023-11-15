@@ -6,4 +6,3 @@ Supycap
 matplotlib
 numpy
 plotly
-galvani
